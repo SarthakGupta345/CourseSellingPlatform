@@ -1,0 +1,494 @@
+// Production-Ready Prisma Schema: Gumroad + Udemy Hybrid
+// Supports: Courses, Digital Products, Subscriptions, Memberships
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// USER MANAGEMENT
+// ============================================================================
+
+model User {
+  id       String  @id @default(cuid())
+  email    String  @unique
+  username String? @unique
+  name     String
+  password String?
+  role     Role    @default(CUSTOMER)
+
+  // OAuth providers
+  googleId String? @unique @map("google_id")
+  githubId String? @unique @map("github_id")
+
+  // Profile
+  profilePhoto String  @default("https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y") @map("profile_photo")
+  bio          String?
+  website      String?
+
+  // Security
+  emailVerified Boolean @default(false) @map("email_verified")
+  isMfaEnabled  Boolean @default(false) @map("is_mfa_enabled")
+  isActive      Boolean @default(true) @map("is_active")
+  isBanned      Boolean @default(false) @map("is_banned")
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  lastLoginAt DateTime? @map("last_login_at")
+
+  // Relations
+  creatorProfile CreatorProfile?
+  purchases      Purchase[]
+  subscriptions  Subscription[]
+  cart           CartItem[]
+  wishlist       Wishlist[]
+  reviews        Review[]
+
+  @@index([email])
+  @@index([username])
+  @@map("users")
+}
+
+model CreatorProfile {
+  id     String @id @default(cuid())
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Creator Info
+  displayName String  @map("display_name")
+  tagline     String?
+  about       String?
+  coverPhoto  String? @map("cover_photo")
+
+  // Social Links
+  twitter  String?
+  linkedin String?
+  youtube  String?
+  website  String?
+
+  // Stats & Settings
+  totalEarnings Float  @default(0) @map("total_earnings")
+  totalSales    Int    @default(0) @map("total_sales")
+  rating        Float? @default(0)
+  reviewCount   Int    @default(0) @map("review_count")
+
+  // Payment
+  stripeAccountId String? @map("stripe_account_id")
+  paypalEmail     String? @map("paypal_email")
+
+  // Verification
+  isVerified Boolean @default(false) @map("is_verified")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  products Product[]
+
+  @@index([userId])
+  @@map("creator_profiles")
+}
+
+// ============================================================================
+// PRODUCTS (Courses + Digital Products)
+// ============================================================================
+
+model Product {
+  id        String         @id @default(cuid())
+  creatorId String         @map("creator_id")
+  creator   CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  // Basic Info
+  name        String
+  slug        String  @unique
+  description String
+  shortDesc   String? @map("short_desc")
+  thumbnail   String
+  coverImage  String? @map("cover_image")
+
+  // Type & Category
+  productType ProductType @map("product_type")
+  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  String      @map("category_id")
+  tags        Tag[]
+
+  // Pricing
+  pricing        PricingType @default(PAID)
+  price          Float       @default(0)
+  compareAtPrice Float?      @map("compare_at_price")
+  currency       String      @default("USD")
+
+  // For subscriptions/memberships
+  recurringPrice  Float?           @map("recurring_price")
+  recurringPeriod RecurringPeriod? @map("recurring_period")
+
+  // Stats
+  totalSales   Int    @default(0) @map("total_sales")
+  totalRevenue Float  @default(0) @map("total_revenue")
+  viewCount    Int    @default(0) @map("view_count")
+  rating       Float? @default(0)
+  reviewCount  Int    @default(0) @map("review_count")
+
+  // Status
+  isPublished Boolean @default(false) @map("is_published")
+  isDeleted   Boolean @default(false) @map("is_deleted")
+  isFeatured  Boolean @default(false) @map("is_featured")
+
+  // SEO
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  publishedAt DateTime? @map("published_at")
+
+  // Relations
+  curriculum    Module[]
+  faqs          Faq[]
+  reviews       Review[]
+  purchases     Purchase[]
+  cartItems     CartItem[]
+  wishlistItems WishlistItem[]
+  files         ProductFile[]
+  discounts     Discount[]
+
+  @@index([creatorId])
+  @@index([slug])
+  @@index([productType])
+  @@index([categoryId])
+  @@index([isPublished, isDeleted])
+  @@map("products")
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  icon        String?
+  parentId    String?    @map("parent_id")
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+
+  products Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@index([parentId])
+  @@map("categories")
+}
+
+model Tag {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  products Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([slug])
+  @@map("tags")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model Discount {
+  id        String       @id @default(cuid())
+  code      String       @unique
+  type      DiscountType
+  amount    Float?
+  percent   Float?
+  startDate DateTime
+  endDate   DateTime
+
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// COURSE CURRICULUM (For Course-type products)
+// ============================================================================
+
+model Module {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  order       Int
+
+  lectures Lecture[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([productId])
+  @@map("modules")
+}
+
+model Lecture {
+  id       String @id @default(cuid())
+  moduleId String @map("module_id")
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  order       Int
+
+  // Content
+  contentType ContentType @map("content_type")
+  videoUrl    String?     @map("video_url")
+  duration    Int? // in seconds
+  fileUrl     String?     @map("file_url")
+  content     String? // For text/markdown content
+
+  // Settings
+  isFree      Boolean @default(false) @map("is_free") // Preview lectures
+  isPublished Boolean @default(true) @map("is_published")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([moduleId])
+  @@map("lectures")
+}
+
+// ============================================================================
+// DIGITAL FILES (For non-course products)
+// ============================================================================
+
+model ProductFile {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  name     String
+  fileUrl  String @map("file_url")
+  fileType String @map("file_type") // mime type
+  fileSize BigInt @map("file_size") // in bytes
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([productId])
+  @@map("product_files")
+}
+
+// ============================================================================
+// PURCHASES & ORDERS
+// ============================================================================
+
+model Purchase {
+  id        String  @id @default(cuid())
+  userId    String  @map("user_id")
+  user      User    @relation(fields: [userId], references: [id])
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id])
+
+  // Payment Details
+  amount        Float
+  currency      String        @default("USD")
+  paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
+  paymentMethod String?       @map("payment_method")
+
+  // Transaction IDs
+  stripePaymentId String? @unique @map("stripe_payment_id")
+  invoiceNumber   String? @unique @map("invoice_number")
+
+  // Coupon/Discount
+  couponCode     String? @map("coupon_code")
+  discountAmount Float?  @map("discount_amount")
+
+  // Refund
+  isRefunded   Boolean   @default(false) @map("is_refunded")
+  refundedAt   DateTime? @map("refunded_at")
+  refundAmount Float?    @map("refund_amount")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([productId])
+  @@index([paymentStatus])
+  @@map("purchases")
+}
+
+model Subscription {
+  id        String @id @default(cuid())
+  userId    String @map("user_id")
+  user      User   @relation(fields: [userId], references: [id])
+  productId String @map("product_id")
+
+  status SubscriptionStatus @default(ACTIVE)
+
+  // Pricing
+  amount        Float
+  currency      String          @default("USD")
+  billingPeriod RecurringPeriod @map("billing_period")
+
+  // Dates
+  currentPeriodStart DateTime  @map("current_period_start")
+  currentPeriodEnd   DateTime  @map("current_period_end")
+  cancelAt           DateTime? @map("cancel_at")
+  canceledAt         DateTime? @map("canceled_at")
+
+  // Payment Provider
+  stripeSubscriptionId String? @unique @map("stripe_subscription_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+// ============================================================================
+// CART & WISHLIST
+// ============================================================================
+
+model CartItem {
+  id        String  @id @default(cuid())
+  userId    String  @map("user_id")
+  quantity  Int     @default(1)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@map("cart_items")
+}
+
+model Wishlist {
+  id           String         @id @default(cuid())
+  userId       String         @map("user_id")
+  name         String
+  wishlistItem WishlistItem[]
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now()) @map("created_at")
+}
+
+model WishlistItem {
+  id         String @id @default(cuid())
+  productId  String @map("product_id")
+  wishlistId String @map("wishlist_id")
+
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([productId, wishlistId])
+  @@map("wishlist_items")
+}
+
+model Review {
+  id        String  @id @default(cuid())
+  userId    String  @map("user_id")
+  user      User    @relation(fields: [userId], references: [id])
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  rating  Float
+  title   String?
+  comment String
+
+  isApproved Boolean @default(true) @map("is_approved")
+  isFlagged  Boolean @default(false) @map("is_flagged")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, productId])
+  @@index([productId])
+  @@index([rating])
+  @@map("reviews")
+}
+
+model Faq {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  question String
+  answer   String
+  order    Int    @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([productId])
+  @@map("faqs")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum Role {
+  CUSTOMER
+  CREATOR
+  ADMIN
+}
+
+enum ProductType {
+  COURSE // Video course like Udemy
+  EBOOK // Digital book
+  AUDIO // Audio files, podcasts
+  SOFTWARE // Software, plugins, apps
+  TEMPLATE // Design templates, code templates
+  MEMBERSHIP // Recurring membership
+  PHYSICAL // Physical products
+  SERVICE // Consultation, service
+  OTHER
+}
+
+enum ContentType {
+  VIDEO
+  AUDIO
+  PDF
+  TEXT
+  QUIZ
+  ASSIGNMENT
+}
+
+enum PricingType {
+  FREE
+  PAID
+  PAY_WHAT_YOU_WANT
+  SUBSCRIPTION
+}
+
+enum RecurringPeriod {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+}

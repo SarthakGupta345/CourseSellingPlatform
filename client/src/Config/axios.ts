@@ -10,8 +10,4 @@ export const axiosInstance = await axios.create({
 
 export default axiosInstance
 
-axiosInstance.interceptors.response.use((response) => {
-    return response
-}, (error) => {
-    return Promise.reject(error)
-})
+axiosInstance.interceptors.response.use((response) => response, (error) => Promise.reject(error))

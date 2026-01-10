@@ -34,7 +34,7 @@ export default function RootLayout({
       >
         <AppProvider>
           <MainHeader />
-          {children}
+          {children} 
           <MainFooter />
           <ConnectFooter />
         </AppProvider>

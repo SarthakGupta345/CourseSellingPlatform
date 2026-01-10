@@ -5,6 +5,7 @@ import MainHeader from "@/components/Header/mainHeader";
 import MainFooter from "@/components/Footer/mainFooter";
 import PriceHeader from "@/components/Header/PriceHeader";
 import ConnectFooter from "@/components/Footer/connect";
+import AppProvider from "@/Providers/appProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +32,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <MainFooter/>
-        <ConnectFooter/>
+        <AppProvider>
+          <MainHeader />
+          {children}
+          <MainFooter />
+          <ConnectFooter />
+        </AppProvider>
       </body>
     </html>
   );

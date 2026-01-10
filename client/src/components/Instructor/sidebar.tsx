@@ -1,11 +1,15 @@
 import React from 'react'
-import { BsCurrencyDollar } from 'react-icons/bs'
-import { IoStatsChart } from 'react-icons/io5'
+import { BsBank2, BsCurrencyDollar } from 'react-icons/bs'
+import { IoMdSettings } from 'react-icons/io'
+import { IoSettings, IoStatsChart } from 'react-icons/io5'
+import { MdMenuBook } from 'react-icons/md'
+import { RiHomeSmile2Fill } from 'react-icons/ri'
+import { TbRosetteDiscount } from 'react-icons/tb'
 
 const option = [
     {
         name: "Dashboard",
-        icon: <IoStatsChart className='size-6' />
+        icon: <RiHomeSmile2Fill className='size-6' />
 
     },
     {
@@ -22,17 +26,20 @@ const option = [
         icon: <BsCurrencyDollar className='size-6' />
     }, {
         name: "Payouts",
-        icon: <BsCurrencyDollar className='size-6' />
+        icon: <BsBank2 className='size-6' />
     }, {
         name: "Discounts",
-        icon: <IoStatsChart className='size-6' />
+        icon: <TbRosetteDiscount className='size-6' />
     }
 ]
 
 const Sidebar = () => {
     return (
         <div className='w-70   overflow-x-hidden h-screen border-r border-neutral-700  text-white bg-black'>
-            <p className='text-3xl ml-5 mt-5 font-semibold'>LearnForge</p>
+            <div className='flex ml-4 mt-5 gap-2 cursor-pointer'>
+                <MdMenuBook className='size-9' />
+                <p className='text-3xl  font-semibold'>LearnForge</p>
+            </div>
             <div className='mt-10'>
 
                 {
@@ -49,9 +56,9 @@ const Sidebar = () => {
 
             </div>
 
-            <div className='mt-45'>
+            <div className='mt-40'>
                 <div className='flex py-4 px-4  gap-3 border-t cursor-pointer border-neutral-700'>
-                    <IoStatsChart className='size-6' />
+                    <IoMdSettings className='size-6' />
                     <p className='text-lg'>Settings</p>
                 </div>
 

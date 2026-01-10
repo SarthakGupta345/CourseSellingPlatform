@@ -6,28 +6,28 @@ const externalLinks = [
     {
         name: "Github",
         link: "https://github.com/learnforge",
-        icon:<FaGithub />
+        icon: <FaGithub />
 
-    },{
-        name:"Linkedin",
-        link:"https://www.linkedin.com/in/learnforge/",
-        icon:<FaLinkedin className='size-10' />
-    },{
-        name:"Twitter",
-        link:"https://twitter.com/learnforge",
-        icon:<FaLinkedin className=' size-10' />
-    },{
-        name:"Facebook",
-        link:"https://www.facebook.com/learnforge",
-        icon:<FaYoutube className='text-black size-10' />
-    },{
-        name:"Instagram",
-        link:"https://www.ins",
-        icon:<FaInstagram className='size-10 ' />
-    },{
-        name:"Youtube",
-        link:"https://www.youtube.com/learnforge",
-        icon:<FaLinkedin />
+    }, {
+        name: "Linkedin",
+        link: "https://www.linkedin.com/in/learnforge/",
+        icon: <FaLinkedin className='size-10' />
+    }, {
+        name: "Twitter",
+        link: "https://twitter.com/learnforge",
+        icon: <FaLinkedin className=' size-10' />
+    }, {
+        name: "Facebook",
+        link: "https://www.facebook.com/learnforge",
+        icon: <FaYoutube className='text-black size-10' />
+    }, {
+        name: "Instagram",
+        link: "https://www.ins",
+        icon: <FaInstagram className='size-10 ' />
+    }, {
+        name: "Youtube",
+        link: "https://www.youtube.com/learnforge",
+        icon: <FaLinkedin />
     }
 ]
 
@@ -43,7 +43,9 @@ const ConnectFooter = () => {
                 {
                     externalLinks.map((link) => {
                         return (
-                            <div className='flex gap-2 cursor-pointer'>
+                            <div className='flex gap-2 cursor-pointer'
+                                key={link.name}
+                            >
                                 <p className='mt-1 '>{link.icon}</p>
                             </div>
                         )

@@ -21,6 +21,7 @@ model User {
   name     String
   password String?
   role     Role    @default(CUSTOMER)
+  refreshToken String?
 
   // OAuth providers
   googleId String? @unique @map("google_id")

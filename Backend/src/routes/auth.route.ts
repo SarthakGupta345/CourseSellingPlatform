@@ -6,10 +6,8 @@ const router = express.Router()
 router.post("/generateLoginOTP", generateLoginOTP)
 router.post("/login", Login);
 router.post('/generateSignupOTP', generateSignupOTP)
-router.post("/signup", Signup)
+router.post("/signup",Signup)
 router.post('/logout', logout)
-
-
 
 
 export default router

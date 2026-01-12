@@ -1,14 +1,29 @@
-import Redis from "ioredis"
-import "dotenv/config"
+import Redis from "ioredis";
+import "dotenv/config";
 
-const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379")
+declare global {
+  // Prevent multiple instances in dev (Next.js / hot reload)
+  // eslint-disable-next-line no-var
+  var redis: Redis | undefined;
+}
 
-export default redis
+const redis =
+  global.redis ||
+  new Redis(process.env.REDIS_URL ?? "redis://127.0.0.1:6379", {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: true,
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  global.redis = redis;
+}
 
 redis.on("connect", () => {
-    console.log("Connected to Redis")
-})
+  console.log("✅ Connected to Redis");
+});
 
-redis.on("error", (error) => {
-    console.error("Redis connection error:", error)
-})
+redis.on("error", (err) => {
+  console.error("❌ Redis error:", err.message);
+});
+
+export default redis;

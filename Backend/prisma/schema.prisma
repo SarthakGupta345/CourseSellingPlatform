@@ -15,12 +15,12 @@ datasource db {
 // ============================================================================
 
 model User {
-  id       String  @id @default(cuid())
-  email    String  @unique
-  username String? @unique
-  name     String
-  password String?
-  role     Role    @default(CUSTOMER)
+  id           String  @id @default(cuid())
+  email        String  @unique
+  username     String? @unique
+  name         String
+  password     String?
+  role         Role    @default(CUSTOMER)
   refreshToken String?
 
   // OAuth providers

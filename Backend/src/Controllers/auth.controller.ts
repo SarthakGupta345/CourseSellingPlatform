@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import { prisma } from "../Config/prisma";
 import { authSchema, emailSchema, loginSchema, signupSchema } from "../Schema/auth.schema";
 import redis from "../Config/reddis";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { sendError, sendSuccess } from "../utils/response";
 import crypto from "crypto";
+import "dotenv/config";
 
 // Constants
 const OTP_EXPIRY = 300; // 5 minutes
@@ -15,18 +16,18 @@ const RATE_LIMIT_WINDOW = 3600; // 1 hour
 const MAX_OTP_REQUESTS_PER_HOUR = 5;
 
 // Types
-interface TokenPayload {
+export interface TokenPayload extends JwtPayload {
     id: string;
     email: string;
 }
-
+ 
 // Utility Functions
 const generateOtp = (): string => {
     const otp = crypto.randomInt(100000, 999999);
     return otp.toString();
 };
 
-const getEnvVariable = (key: string): string => {
+export const getEnvVariable = (key: string): string => {
     const value = process.env[key];
     if (!value) {
         throw new Error(`Missing required environment variable: ${key}`);
@@ -71,6 +72,7 @@ const sendOtpEmail = async (email: string, otp: string, name?: string): Promise<
     if (process.env.NODE_ENV === "development") {
         console.log(`OTP for ${email}:`, otp);
     }
+
     // In production, send actual email
     // await emailService.send({ to: email, subject: "Your OTP", otp, name });
 };
@@ -197,7 +199,6 @@ export const Signup = async (req: Request, res: Response): Promise<Response> => 
                 id: true,
                 email: true,
                 name: true,
-                createdAt: true,
             },
         });
 
@@ -376,7 +377,7 @@ export const Login = async (req: Request, res: Response): Promise<Response> => {
     }
 };
 
-const generateTokens = (id: string, email: string): { accessToken: string; refreshToken: string } => {
+export const generateTokens = (id: string, email: string): { accessToken: string; refreshToken: string } => {
     const payload: TokenPayload = { id, email };
 
     const accessToken = jwt.sign(

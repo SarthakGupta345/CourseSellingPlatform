@@ -20,7 +20,7 @@ export interface TokenPayload extends JwtPayload {
     id: string;
     email: string;
 }
- 
+
 // Utility Functions
 const generateOtp = (): string => {
     const otp = crypto.randomInt(100000, 999999);
@@ -471,3 +471,15 @@ export const logout = async (req: Request, res: Response): Promise<Response> => 
         return sendError(res, 500, "Logout failed");
     }
 };
+
+
+export const Me = async (req: Request, res: Response) => {
+    try {
+        return sendSuccess(res, 200, "User details fetched successfully", {
+            user: req.user
+        });
+    } catch (error) {
+        console.error("Error in Me:", error);
+        return sendError(res, 500, "Failed to fetch user details");
+    }
+}

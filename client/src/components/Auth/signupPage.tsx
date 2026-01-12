@@ -47,7 +47,7 @@ const SignupPage = ({ setSelected }: { setSelected: (value: string) => void }) =
         } catch (error: any) {
             console.log("error in signup", error);
             setErrors({
-                general: error?.message || "Something went wrong",
+                general: error?.data?.message || error?.message || "Something went wrong",
             });
         }
     };
@@ -67,7 +67,7 @@ const SignupPage = ({ setSelected }: { setSelected: (value: string) => void }) =
         }
     };
 
-    if (verified) return <OTPPopup setSelected={setSelected} />;
+    if (verified) return <OTPPopup setSelected={setSelected} name={name} email={email} />;
 
     return (
         <div className='w-1/2 justify-center item-center p-4'>

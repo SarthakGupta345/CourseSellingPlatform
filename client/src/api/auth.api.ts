@@ -13,9 +13,8 @@ export const generateSignupOTP = async (name: string, email: string) => {
     return res
 }
 
-
 export const Signup = async (data: signupData) => {
-    const res = await axiosInstance.post("/api/v1/auth/Signup", data)
+    const res = await axiosInstance.post("/auth/signup", data)
     return res
 }
 export interface signupData {

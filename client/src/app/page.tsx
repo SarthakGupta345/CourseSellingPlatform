@@ -4,6 +4,8 @@ import MainHeader from "@/components/Header/mainHeader"
 import PriceHeader from "@/components/Header/PriceHeader"
 import FeaturesBox from "@/components/Home/slidingBox"
 import SlidingBox from "@/components/Home/slidingBox"
+import { useAppSelector } from "@/Store/hooks"
+import { setAuth } from "@/Store/slices/auth.slice"
 import motion from "framer-motion"
 import React from 'react'
 
@@ -36,53 +38,58 @@ const options = [
 ]
 
 const HomePage = () => {
+
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+
   return (
 
 
-    // <div className='w-full bg-white h-full p-4'>
-    //   This is a Home page
+    <div className='w-full bg-white h-full p-4'>
+      This is a Home page
 
-    //   {/* Learning */}
+      {
+        isAuthenticated ? (
+          <p>Authenticated</p>
+        ) : (
+          <p>Not Authenticated</p>
+        )
+      }
+
+      <div className='mx-auto'>
+        <p className='text-5xl text-black  font-medium'
+          style={{ fontFamily: "-apple-system" }}
+        >Learn Anything You Want</p>
+
+        <div className='flex gap-3'>
+          <div className='rounded-full px-5 cursor-pointer py-3 border border-red-500'>
+            <p>Machine Learning</p>
+          </div>
+          <div className='rounded-full px-5 cursor-pointer py-3 border border-red-500'>
+            <p>Machine Learning</p>
+          </div>
+          {
+            options.map((option) => {
+              return (
+                <div className='rounded-full px-5 cursor-pointer py-3 border border-red-500 '>
+                  <p>{option.name}</p>
+                </div>
+              )
+            })
+          }
+        </div>
+      </div>
+
+      <div>
+        <p>
+          Discover the World of Learning
+        </p>
+      </div>
 
 
-    //   {/* SlidingPages */}
-    //   <FeaturesBox/>
 
-    //   <div className='mx-auto'>
-    //     <p className='text-5xl text-black  font-medium'
-    //       style={{ fontFamily: "-apple-system" }}
-    //     >Learn Anything You Want</p>
-
-    //     <div className='flex gap-3'>
-    //       <div className='rounded-full px-5 cursor-pointer py-3 border border-red-500'>
-    //         <p>Machine Learning</p>
-    //       </div>
-    //       <div className='rounded-full px-5 cursor-pointer py-3 border border-red-500'>
-    //         <p>Machine Learning</p>
-    //       </div>
-    //       {
-    //         options.map((option) => {
-    //           return (
-    //             <div className='rounded-full px-5 cursor-pointer py-3 border border-red-500 '>
-    //               <p>{option.name}</p>
-    //             </div>
-    //           )
-    //         })
-    //       }
-    //     </div>
-    //   </div>
-
-    //   <div>
-    //     <p>
-    //       Discover the World of Learning
-    //     </p>
-    //   </div>
+    </div>
 
 
-
-    // </div>
-
-    <OTPPopup setSelected={() => { }} />
 
   )
 }

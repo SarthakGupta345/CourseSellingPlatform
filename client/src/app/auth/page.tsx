@@ -21,7 +21,7 @@ const AuthPage = () => {
 
             </div>
 
-            {/* {
+            {
                 selected == "Login" ? (
                     <LoginPage setSelected={setSelected} />
 
@@ -29,10 +29,7 @@ const AuthPage = () => {
                     <SignupPage setSelected={setSelected} />
                 )
 
-            } */}
-
-            <SignupOTPPopup setSelected={setSelected} />
-
+            }
 
 
         </div>

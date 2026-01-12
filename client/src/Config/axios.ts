@@ -1,4 +1,5 @@
 import axios from "axios"
+import { queryClient } from "./reactQuery";
 
 export const axiosInstance = await axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -10,4 +11,14 @@ export const axiosInstance = await axios.create({
 
 export default axiosInstance
 
-axiosInstance.interceptors.response.use((response) => response, (error) => Promise.reject(error))
+axiosInstance.interceptors.response.use(
+    res => res,
+    err => {
+        if (err.response?.status === 401) {
+            queryClient.setQueryData(["auth", "me"], {
+                authenticated: false,
+            });
+        }
+        return Promise.reject(err);
+    }
+);

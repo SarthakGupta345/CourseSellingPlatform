@@ -1,17 +1,22 @@
-import { generateSignupOTP, Signup, signupData } from "@/api/auth.api";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { generateSignupOTP, Signup } from "@/api/auth.api";
+import { signupData } from "@/api/auth.api";
 
-export const useGenerateSignupOTP = (name: string, email: string) => {
-    return useQuery({
-        queryKey: ["generateSignupOTP", email],
-        queryFn: () => generateSignupOTP(name, email),
-    });
+export const useGenerateSignupOTP = () => {
+  return useMutation({
+    mutationFn: ({ name, email }: { name: string; email: string }) =>
+      generateSignupOTP(name, email),
+    onError: (error) => {
+      console.log(error);
+    },
+    retry: 0,
+  });
 };
 
-export const useSignup = (data: signupData) => {
-    return useQuery({
-        queryKey: ["signup", data],
-        queryFn: () => Signup(data),
-    });
+export const useSignup = () => {
+  return useMutation({
+    mutationFn: (data: signupData) => Signup(data),
+    retry: 0,
+    
+  });
 };
-

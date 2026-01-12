@@ -7,9 +7,10 @@ import Image from 'next/image'
 import LoginPage from '@/components/Auth/loginPage'
 import SignupPage from '@/components/Auth/signupPage'
 import OTPPopup from '@/components/Auth/OTPpopup'
+import SignupOTPPopup from '@/components/Auth/OTPpopup'
 const AuthPage = () => {
 
-    const [selected, setSelected] = useState<string>("Login")
+    const [selected, setSelected] = useState<string>("Signup")
 
 
     return (
@@ -29,7 +30,9 @@ const AuthPage = () => {
                 )
 
             } */}
-            <OTPPopup/>
+
+            <SignupOTPPopup setSelected={setSelected} />
+
 
 
         </div>

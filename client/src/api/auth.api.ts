@@ -6,7 +6,7 @@ export const verifyEmail = async (email: string) => {
 }
 
 export const generateSignupOTP = async (name: string, email: string) => {
-    const res = await axiosInstance.post("/api/v1/auth/generateSignupOTP", {
+    const res = await axiosInstance.post("/auth/generateSignupOTP", {
         email,
         name
     })

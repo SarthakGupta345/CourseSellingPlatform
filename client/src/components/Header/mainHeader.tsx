@@ -3,7 +3,6 @@ import { Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
-
 const options = [
     {
         name: "Pricing",
@@ -48,12 +47,14 @@ const MainHeader = () => {
             </div>
 
             {/* profile */}
-            <div className='flex   ml-auto'>
+            <div className='flex  ml-auto'>
 
                 {
-                    options.map((option) => {
+                    options.map((option, index) => {
                         return (
-                            <div className='border hover:border-white border-pink-700  cursor-pointer rounded-full bg-pink-700 px-6 py-2' text-white item-center justify-center>
+                            <div
+                                key={index}
+                                className='border hover:border-white border-pink-700  cursor-pointer rounded-full bg-pink-700 px-6 py-2' text-white item-center justify-center>
                                 <p className='text-white font-semibold mt-1'>{option.name}</p>
                             </div>
                         )

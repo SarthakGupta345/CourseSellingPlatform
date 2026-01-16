@@ -44,12 +44,11 @@ model User {
   lastLoginAt DateTime? @map("last_login_at")
 
   // Relations
-  creatorProfile CreatorProfile?
-  purchases      Purchase[]
-  subscriptions  Subscription[]
-  cart           CartItem[]
-  wishlist       Wishlist[]
-  reviews        Review[]
+  purchases     Purchase[]
+  subscriptions Subscription[]
+  cart          CartItem[]
+  wishlist      Wishlist[]
+  reviews       Review[]
 
   @@index([email])
   @@index([username])
@@ -57,15 +56,17 @@ model User {
 }
 
 model CreatorProfile {
-  id     String @id @default(cuid())
-  userId String @unique @map("user_id")
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id String @id @default(cuid())
 
   // Creator Info
   displayName String  @map("display_name")
   tagline     String?
   about       String?
   coverPhoto  String? @map("cover_photo")
+  coverPhotoKey String?
+  bgPhoto     String? @map("bg_photo")
+  bgPhotoKey  String?
+  email       String  @unique
 
   // Social Links
   twitter  String?
@@ -92,7 +93,6 @@ model CreatorProfile {
   // Relations
   products Product[]
 
-  @@index([userId])
   @@map("creator_profiles")
 }
 

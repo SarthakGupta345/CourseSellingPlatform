@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { NextFunction, Response, Request, RequestHandler } from "express";
 
 export const sendError = (
   res: Response,
@@ -6,6 +6,7 @@ export const sendError = (
   message: string,
   error?: any
 ) => {
+  console.log(`Generated error: ${message}`);
   return res.status(statusCode).json({
     success: false,
     message,
@@ -25,3 +26,16 @@ export const sendSuccess = (
     data,
   });
 };
+
+
+export const asyncHandler =
+  (
+    fn: (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<unknown>
+  ): RequestHandler =>
+    (req, res, next) => {
+      Promise.resolve(fn(req, res, next)).catch(next);
+    };

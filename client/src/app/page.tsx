@@ -45,7 +45,7 @@ const HomePage = () => {
   return (
 
 
-    <MainPage/>
+    <MainPage />
 
 
 

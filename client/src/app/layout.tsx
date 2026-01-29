@@ -34,8 +34,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AppProvider>
-          {/* <MainHeader /> */}
-          {children} 
+          <MainHeader/>
+          {children}
           <MainFooter />
           <ConnectFooter />
         </AppProvider>

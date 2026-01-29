@@ -20,7 +20,7 @@ const options = [
         link: "/discover"
     }, {
         name: "Sell",
-        link: "/sell"
+        link: "/Instructor"
     }
 ]
 const MainHeader = () => {
@@ -54,6 +54,9 @@ const MainHeader = () => {
                         return (
                             <div
                                 key={index}
+                                onClick={()=>{
+                                    router.push(option.link)
+                                }}
                                 className='border hover:border-white border-pink-700  cursor-pointer rounded-full bg-pink-700 px-6 py-2' text-white item-center justify-center>
                                 <p className='text-white font-semibold mt-1'>{option.name}</p>
                             </div>

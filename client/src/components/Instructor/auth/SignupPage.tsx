@@ -1,4 +1,5 @@
 "use client"
+import { instructorSchema } from '@/Constants/Schemas/InstructorSchema'
 import { LinkedinIcon, Plus } from 'lucide-react'
 import React, { useState } from 'react'
 import { BsGithub, BsGoogle, BsLinkedin } from 'react-icons/bs'
@@ -23,6 +24,11 @@ const SignupPage = () => {
 
 
     const handleSave = async () => {
+        const parsed = instructorSchema.safeParse(form);
+        if (!parsed.success) {
+            console.log(parsed.data);
+            return
+        }
 
     }
 

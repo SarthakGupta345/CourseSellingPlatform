@@ -16,7 +16,7 @@ const option = [
 
     },
     {
-        name: "Courses",
+        name: "Product",
         icon: <IoStatsChart className='size-6' />
 
     },
